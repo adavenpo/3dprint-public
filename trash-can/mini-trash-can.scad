@@ -81,8 +81,8 @@ module all_hole_cutters() {
             start_z_center = base_thickness + hole_margin_top_bottom + hex_eff_height_on_face/2 + 
                              (available_pattern_span_z - actual_pattern_height_centers_z)/2;
 
-            for (i = 0; i < num_holes_x; i++) {
-                for (j = 0; j < num_holes_z; j++) {
+            for (i = [0 : num_holes_x-1]) {
+                for (j = [0 : num_holes_z-1]) {
                     translate([start_x + i * hole_spacing_x, 0, start_z_center + j * hole_spacing_z])
                         rotate([90, 0, 0]) // Align cutter axis with Y
                             hex_cutter_prism(hole_diameter, cutter_length);
@@ -110,8 +110,8 @@ module all_hole_cutters() {
              start_z_center = base_thickness + hole_margin_top_bottom + hex_eff_height_on_face/2 + 
                              (available_pattern_span_z - actual_pattern_height_centers_z)/2;
 
-            for (i = 0; i < num_holes_y; i++) {
-                for (j = 0; j < num_holes_z; j++) {
+            for (i = [0 : num_holes_y-1]) {
+                for (j = [0 : num_holes_z-1]) {
                     translate([0, start_y + i * hole_spacing_x, start_z_center + j * hole_spacing_z])
                         rotate([0, 90, 0]) // Align cutter axis with X
                             hex_cutter_prism(hole_diameter, cutter_length);

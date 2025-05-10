@@ -5,14 +5,14 @@ can_height = 150;         // Outer height (Z-axis)
 wall_thickness = 2;       // Thickness of the walls (approximate, measured perpendicular to base plane)
 base_thickness = 3;       // Thickness of the base
 corner_radius = 10;       // Radius for outer corners at the base
-flare_angle = 10;         // Angle (degrees) for sides to flare outwards from vertical
+flare_angle = 5;         // Angle (degrees) for sides to flare outwards from vertical
 
 // Hexagonal Hole Parameters
-hole_diameter = 10;      // Circumscribed diameter of the hexagon (vertex to vertex)
-hole_spacing_x = 15;     // Center-to-center spacing of holes horizontally (measured on the XY projection plane)
-hole_spacing_z = 13;     // Center-to-center spacing of holes vertically (along Z)
-hole_margin_sides = 8;   // Margin from side edges of a face to the first/last hole center (applied to face width at mid-height of holed area)
-hole_margin_top_bottom = 8; // Margin from top/bottom edges of wall to first/last hole center (vertical Z distance)
+hole_diameter = 5;      // Circumscribed diameter of the hexagon (vertex to vertex)
+hole_spacing_x = 8;     // Center-to-center spacing of holes horizontally (measured on the XY projection plane)
+hole_spacing_z = 8;     // Center-to-center spacing of holes vertically (along Z)
+hole_margin_sides = 20;   // Margin from side edges of a face to the first/last hole center (applied to face width at mid-height of holed area)
+hole_margin_top_bottom = 10; // Margin from top/bottom edges of wall to first/last hole center (vertical Z distance)
 
 // Render Quality
 $fn_smooth = 48; // For rounded corners and general smoothness
@@ -121,11 +121,14 @@ module all_hole_cutters() {
         if (available_pattern_span_x_for_centers >= -0.001 && num_holes_z > 0) { // Allow for small floating point inaccuracies
             num_holes_x = floor(available_pattern_span_x_for_centers / hole_spacing_x) + 1;
             actual_pattern_width_centers_x = (num_holes_x - 1) * hole_spacing_x;
-            start_x_center_first_hole = -actual_pattern_width_centers_x / 2; // Centered horizontally
 
-            for (i = 0; i < num_holes_x; i++) {
-                for (j = 0; j < num_holes_z; j++) {
-                    translate([start_x_center_first_hole + i * hole_spacing_x, 0, start_z_center_first_hole + j * hole_spacing_z])
+            for (j = [0 : num_holes_z-1]) {
+                z_offset = start_z_center_first_hole + j * hole_spacing_z;
+                x_offset = (z_offset * tan(flare_angle));
+                start_x_center_first_hole = -actual_pattern_width_centers_x / 2 - x_offset; // Centered horizontally
+                for (i = [0 : num_holes_x-1]) {
+                    x = start_x_center_first_hole + i * (hole_spacing_x + (2*x_offset / num_holes_x));
+                    translate([x, 0, z_offset])
                         rotate([90, 0, 0]) // Align cutter axis with Y
                             hex_cutter_prism(hole_diameter, cutter_length);
                 }
@@ -140,11 +143,14 @@ module all_hole_cutters() {
         if (available_pattern_span_y_for_centers >= -0.001 && num_holes_z > 0) { // Allow for small floating point inaccuracies
             num_holes_y = floor(available_pattern_span_y_for_centers / hole_spacing_x) + 1; // Using hole_spacing_x for consistency
             actual_pattern_width_centers_y = (num_holes_y - 1) * hole_spacing_x;
-            start_y_center_first_hole = -actual_pattern_width_centers_y / 2; // Centered horizontally
 
-            for (i = 0; i < num_holes_y; i++) {
-                for (j = 0; j < num_holes_z; j++) {
-                    translate([0, start_y_center_first_hole + i * hole_spacing_x, start_z_center_first_hole + j * hole_spacing_z])
+            for (j = [0 : num_holes_z-1]) {
+                z_offset = start_z_center_first_hole + j * hole_spacing_z;
+                y_offset = (z_offset * tan(flare_angle));
+                start_y_center_first_hole = -actual_pattern_width_centers_y / 2 - y_offset; // Centered horizontally
+                for (i = [0 : num_holes_y-1]) {
+                    y = start_y_center_first_hole + i * (hole_spacing_x + (2*y_offset / num_holes_y));
+                    translate([0, y, z_offset])
                         rotate([0, 90, 0]) // Align cutter axis with X
                             hex_cutter_prism(hole_diameter, cutter_length);
                 }
@@ -160,4 +166,3 @@ difference() {
     trash_can_solid_body();
     all_hole_cutters();
 }
-
