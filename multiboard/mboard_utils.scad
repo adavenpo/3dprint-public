@@ -45,6 +45,8 @@ module mid_thread_bolt(length, shank = 0, head_sides = 6) {
     ];
 
     turns = ((length-shank) / 3.1) - 0.93;
+    emboss_depth = 1.0;
+    emboss_width = 1.0;
     difference() {
         union() {
             translate([0,0,3]) {
@@ -58,14 +60,14 @@ module mid_thread_bolt(length, shank = 0, head_sides = 6) {
         for (i = [0:head_sides]) {
             rotate([0,0,i*(360/head_sides)]) translate([6.4,0,0])
                 difference() {
-                    cylinder(h=0.5, r=4.0, $fn=180, center = true);
-                    cylinder(h=1.6, r=3.5, $fn=180, center = true);
+                    cylinder(h=emboss_depth, r=4.0, $fn=180, center = true);
+                    cylinder(h=emboss_depth+1, r=4.0 - emboss_width, $fn=180, center = true);
                 }
         }
         for (r = [2.9, 6.4, 10.4]) {
             difference() {
-                cylinder(h=1.0, r=r, $fn=180, center = true);
-                cylinder(h=1.2, r=r-0.4, $fn=180, center = true);
+                cylinder(h=emboss_depth, r=r, $fn=180, center = true);
+                cylinder(h=emboss_depth+1, r=r - emboss_width, $fn=180, center = true);
             }
         }
 //        difference() {
